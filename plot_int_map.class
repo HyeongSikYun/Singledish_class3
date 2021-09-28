@@ -1,0 +1,96 @@
+define character outfile*40 infile*40 
+define real rms[3721] tsys[3721]
+define real lambda beta 
+define integer num index sw1 sw2 
+
+set extension .class
+set align f
+set nomatch
+set unit v f
+set angle s
+set weight sigma
+set box D
+
+!===================================================================
+
+LET infile = Orion_13CO_baseline_subtracted
+
+LET sw1 = 
+LET sw2 = 
+
+!===================================================================
+
+FILE IN 'infile'
+FIND
+GET FIRST
+LET rms[1] = R%HEAD%BAS%SIGFI
+LET tsys[1] = R%HEAD%GEN%TSYS
+
+FOR I 2 TO found
+GET NEXT
+
+LET rms[I] = R%HEAD%BAS%SIGFI
+LET tsys[I] = R%HEAD%GEN%TSYS
+NEXT 
+
+TABLE 'infile'_rms NEW /MATH R%HEAD%BAS%SIGFI /NOCHECK
+LET MAP%DIAM 13.7
+XY_MAP 'infile'_rms /NOGRID
+
+TABLE 'infile'_tsys NEW /MATH R%HEAD%GEN%TSYS /NOCHECK
+LET MAP%DIAM 13.7
+XY_MAP 'infile'_tsys /NOGRID
+
+TABLE 'infile'_tdv NEW /MATH TDV('sw1','sw2') /NOCHECK
+LET MAP%DIAM 13.7
+XY_MAP 'infile'_tdv /NOGRID
+
+!===================================================================
+!Make maps of rms, Tsys, and integrated intensity using gildas/Greg
+
+g\SET PLOT_PAGE PORTRAIT
+g\SET FONT SIMPLEX
+g\SET CHARACTER 0.5
+
+g\clear
+g\image 'infile'_rms.lmv
+g\set box 6 14 21 29
+g\limits /rgdata
+g\plot /position 6 14 21 29
+g\box /u m
+g\wedge
+!g\label "RA offset (')" /X
+g\label "Dec offset (')" /Y
+g\draw text 11 5 "RMS [K]" 6 270
+
+g\image 'infile'_tsys.lmv
+g\set box 6 14 11.5 19.5
+g\limits /rgdata
+g\plot /position 6 14 11.5 19.5
+g\box /u m
+g\wedge
+!g\label "RA offset (')" /X
+g\labe "Dec offset (')" /Y
+g\draw text 11 5 "Tsys [K]" 6 270
+
+g\image 'infile'_tdv.lmv
+g\set box 6 14 2 10
+g\limits /rgdata
+g\plot /position 6 14 2 10
+g\box /u m
+g\wedge
+g\label "RA offset (')" /X
+g\labe "Dec offset (')" /Y
+g\draw text 11 6 "Tdv [K*km/s]" 6 270
+
+g\hardcopy 'infile'_plot.ps /device ps color
+
+set character 0.6
+
+SYSTEM "rm -f *.lmv"
+SYSTEM "rm -f *.wei"
+SYSTEM "rm -f *.tab"
+SYSTEM "rm -f *.ps"
+
+
+

@@ -1,0 +1,56 @@
+DEFINE character infile*40
+DEFINE integer sw1 sw2 mx1 mx2
+
+SET extension .class
+SET align f
+SET unit v f
+SET nomatch
+SET angle s
+SET box D
+
+LET infile = Orion_13CO_baseline_subtracted
+
+LET sw1 = 
+LET sw2 = 
+LET mx1 = 
+LET mx2 = 
+
+FILE OUT 'infile'_trim MULTI
+FILE IN 'infile'
+FIND
+
+GET FIRST
+SET MODE X 'mx1' 'mx2'
+SET WIN 'sw1' 'sw2'
+BASE 1
+WRITE
+
+FOR J 2 TO found
+GET NEXT
+BASE 1
+WRITE
+NEXT
+
+FILE IN 'infile'_trim
+FIND
+LET type lmv
+IF FOUND.NE.0 THEN
+
+table 'infile' NEW /range 'mx1' 'mx2' v /nocheck 
+LET map%diam 13.7
+XY_MAP 'infile' /nogrid
+
+RUN gildas_fits
+
+SYSTEM "rm -f *.lmv"
+SYSTEM "rm -f *.wei"
+SYSTEM "rm -f *.tab"
+SYSTEM "rm -f *_trim.class"
+SYSTEM "rm -f gildas_fits.init"
+
+ELSE
+
+SAY "Input file problem!!!!"
+BREAK
+
+ENDIF
