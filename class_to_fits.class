@@ -10,10 +10,10 @@ SET box D
 
 LET infile = Orion_13CO_baseline_subtracted
 
-LET sw1 = 
-LET sw2 = 
-LET mx1 = 
-LET mx2 = 
+LET sw1 = 3
+LET sw2 = 17
+LET mx1 = -3
+LET mx2 = 23
 
 FILE OUT 'infile'_trim MULTI
 FILE IN 'infile'
@@ -40,13 +40,13 @@ table 'infile' NEW /range 'mx1' 'mx2' v /nocheck
 LET map%diam 13.7
 XY_MAP 'infile' /nogrid
 
-RUN gildas_fits
+V\FITS 'infile'.fits from 'infile'.lmv
 
 SYSTEM "rm -f *.lmv"
 SYSTEM "rm -f *.wei"
 SYSTEM "rm -f *.tab"
-SYSTEM "rm -f *_trim.class"
 SYSTEM "rm -f gildas_fits.init"
+SYSTEM "rm -r *_trim.class"
 
 ELSE
 
