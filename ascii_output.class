@@ -1,0 +1,17 @@
+define character outfile*40 infile*40
+
+set align f
+set unit v f
+set angle s
+set box D
+
+LET outfile = output
+LET infile = Orion_13CO_baseline_subtracted
+
+FILE IN 'infile'.class
+FIND
+if FOUND.gt.0 then
+  GET FIRST
+  GREG 'outfile'".dat" /formatted
+ENDIF
+RETURN
